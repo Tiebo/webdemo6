@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,500;0,600;0,700;0,800;0,900;1,800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 引入 Axios 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="cont">
+        <div class="one">
+          <h1>🌦️ 天气应用 ☔️</h1>
+        </div>
+      </div>
+      <div class="two">
+        <div class="card">
+          <div class="search">
+            <input type="text" class="search-bar" placeholder="Search" v-model="city_code"/>
+            <button @click="getWeather">
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                stroke-width="0"
+                viewBox="0 0 16 16"
+                height="1em"
+                width="1.5em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z"
+                  clip-rule="evenodd"
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div class="weather" v-for="live in lives_data" :key="live.id">
+            <h2 class="city">{{live.city}}的天气</h2>
+            <h1 class="temp">{{live.temperature_float}}°C</h1>
+            <div class="flex">
+              <img
+                src="https://openweathermap.org/img/wn/04d.png"
+                alt=""
+                class="icon"
+              />
+              <div class="description">{{live.weather}}</div>
+            </div>
+            <div class="other">
+              <div class="humidity">湿度: {{live.humidity_float}}%</div>
+              <div class="wind">风力: {{live.windpower}}km/h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      const { createApp, ref } = Vue;
+
+      createApp({
+        setup() {
+          let city_code = ref("510100");
+          let lives_data = ref([]);
+          function getWeather() {
+            const key = "04d68e1a589236483bca685ef3445597";
+            // 使用 Axios 发送 GET 请求获取天气数据
+            axios
+              .get(
+                `https://restapi.amap.com/v3/weather/weatherInfo?key=${key}&city=${city_code.value}`
+              )
+              .then((response) => {
+                lives_data.value = response.data.lives;
+                console.log(lives_data.value);
+              });
+          }
+          getWeather();
+          return {
+            city_code,
+            getWeather,
+            lives_data,
+          };
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
